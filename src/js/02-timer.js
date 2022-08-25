@@ -22,39 +22,33 @@ const options = {
   onClose(selectedDates) {
     const selectedUserDate = selectedDates[0].getTime();
 
-    if (selectedUserDate <= options.defaultDate.getTime()) {
+    if (selectedUserDate <= Date.now()) {
       refs.startBtn.setAttribute('disabled', 'button-disabled');
       return Notiflix.Notify.failure('Please choose a date in the future');
     }
 
     refs.startBtn.removeAttribute('disabled');
-    refs.startBtn.addEventListener('click', onStartBtnClick);
+    refs.startBtn.addEventListener('click', startTimer);
 
-    function onStartBtnClick() {
-      timer.startTime();
+    function startTimer() {
+      refs.startBtn.setAttribute('disabled', 'button-disabled');
+      refs.datePicker.setAttribute('disabled', 'input-disabled');
+
+      const toTargetDate = setInterval(() => {
+        const currentDate = Date.now();
+        const deltaTime = selectedUserDate - currentDate;
+        const { days, hours, minutes, seconds } = convertMs(deltaTime);
+
+        refs.seconds.textContent = `${seconds}`;
+        refs.minutes.textContent = `${minutes}`;
+        refs.hours.textContent = `${hours}`;
+        refs.days.textContent = `${days}`;
+
+        if (seconds === '00') {
+          return clearInterval(toTargetDate);
+        }
+      }, TIME_INTERVAL);
     }
-
-    const timer = {
-      startTime() {
-        refs.startBtn.setAttribute('disabled', 'button-disabled');
-        refs.datePicker.setAttribute('disabled', 'input-disabled');
-
-        const toTargetDate = setInterval(() => {
-          const currentDate = Date.now();
-          const deltaTime = selectedUserDate - currentDate;
-          const { days, hours, minutes, seconds } = convertMs(deltaTime);
-
-          refs.seconds.textContent = `${seconds}`;
-          refs.minutes.textContent = `${minutes}`;
-          refs.hours.textContent = `${hours}`;
-          refs.days.textContent = `${days}`;
-
-          if (seconds === '00') {
-            return clearInterval(toTargetDate);
-          }
-        }, TIME_INTERVAL);
-      },
-    };
   },
 };
 flatpickr(refs.datePicker, options);
