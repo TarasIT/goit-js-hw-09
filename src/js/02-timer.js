@@ -45,7 +45,7 @@ const options = {
         refs.days.textContent = `${days}`;
 
         if (seconds === '00') {
-          return clearInterval(toTargetDate);
+          clearInterval(toTargetDate);
         }
       }, TIME_INTERVAL);
     }
